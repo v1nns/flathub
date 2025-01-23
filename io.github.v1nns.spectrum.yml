@@ -1,0 +1,120 @@
+app-id: io.github.v1nns.spectrum
+runtime: org.freedesktop.Platform
+runtime-version: '24.08'
+sdk: org.freedesktop.Sdk
+command: spectrum
+finish-args:
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --share=network
+  - --socket=pulseaudio
+  - --filesystem=host
+
+add-extensions:
+  org.freedesktop.Platform.ffmpeg-full:
+    directory: lib/ffmpeg
+    add-ld-path: .
+    version: 24.08
+    no-autodownload: true
+    autodelete: false
+
+modules:
+
+  - name: fftw3
+    buildsystem: cmake-ninja
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=RelWithDebInfo
+      - -Wno-dev
+      - -DENABLE_THREADS=ON
+    sources:
+      - type: archive
+        url: http://www.fftw.org/fftw-3.3.10.tar.gz
+        sha256: 56c932549852cddcfafdab3820b0200c7742675be92179e59e6215b340e26467
+
+  - name: curl
+    buildsystem: autotools
+    cleanup:
+    config-opts:
+      - "--with-openssl"
+    sources:
+      - type: archive
+        url: https://github.com/curl/curl/releases/download/curl-8_11_1/curl-8.11.1.tar.gz
+        sha256: a889ac9dbba3644271bd9d1302b5c22a088893719b72be3487bc3d401e5c4e80
+
+  - name: mm-common
+    cleanup:
+      - /
+    sources:
+      - type: archive
+        url: https://download.gnome.org/sources/mm-common/0.9/mm-common-0.9.12.tar.xz
+        sha256: ceffdcce1e5b52742884c233ec604bf6fded12eea9da077ce7a62c02c87e7c0b
+
+  - name: libsigc++-2.0
+    cleanup:
+      - /include
+      - /lib/*/include
+      - "*.a"
+    config-opts:
+      - --disable-documentation
+    sources:
+      - type: archive
+        url: https://download.gnome.org/sources/libsigc++/2.12/libsigc++-2.12.1.tar.xz
+        sha256: a9dbee323351d109b7aee074a9cb89ca3e7bcf8ad8edef1851f4cf359bd50843
+
+  - name: glibmm
+    buildsystem: meson
+    cleanup:
+      - /include
+      - /lib/*/include
+      - "*.a"
+      - "*.la"
+    config-opts:
+      - -Dbuild-documentation=false
+      - -Dbuild-examples=false
+    sources:
+      - type: archive
+        url: https://download.gnome.org/sources/glibmm/2.66/glibmm-2.66.7.tar.xz
+        sha256: fe02c1e5f5825940d82b56b6ec31a12c06c05c1583cfe62f934d0763e1e542b3
+
+  - name: libxml++-2.6
+    cleanup:
+      - /lib/libxml++-2.6
+    config-opts:
+      - --disable-documentation
+    sources:
+      - type: archive
+        url: https://download.gnome.org/sources/libxml++/2.42/libxml++-2.42.3.tar.xz
+        sha256: 74b95302e24dbebc56e97048e86ad0a4121fc82a43e58d381fbe1d380e8eba04
+
+  - name: ftxui
+    buildsystem: cmake-ninja
+    sources:
+      - type: git
+        url: https://github.com/ArthurSonzogni/ftxui
+        commit: 7de4f8683d530ff5573483f40b17df4b3c6ed736
+
+  - name: nlohmann_json
+    buildsystem: cmake-ninja
+    config_opts:
+      - -DCMAKE_BUILD_TYPE=RelWithDebInfo
+      - -DJSON_MultipleHeaders=ON
+      - -DJSON_BuildTests=OFF
+    sources:
+      - type: git
+        url: https://github.com/nlohmann/json
+        tag: v3.11.2
+
+  - name: spectrum
+    buildsystem: cmake-ninja
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DENABLE_INSTALL=ON
+      - -DSPECTRUM_DEBUG=OFF
+      - -DENABLE_TESTS=OFF
+      - -DENABLE_COVERAGE=OFF
+      - -DDISABLE_POPULATE=ON
+      - --no-warn-unused-cli
+    sources:
+      - type: git
+        url: https://github.com/v1nns/spectrum
+        branch: main
