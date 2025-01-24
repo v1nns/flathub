@@ -117,4 +117,4 @@ modules:
     sources:
       - type: git
         url: https://github.com/v1nns/spectrum
-        branch: main
+        commit: 2ea1e7ac104e9878bda5c9c754f9542e48fdcee4
